@@ -1128,6 +1128,221 @@
             }
           }
         ]
+      },
+      {
+        "name": "Sales vIndividualCustomer",
+        "columns": [
+          {
+            "name": "BusinessEntityID",
+            "dataType": "int64",
+            "sourceColumn": "BusinessEntityID"
+          },
+          {
+            "name": "Title",
+            "dataType": "string",
+            "sourceColumn": "Title"
+          },
+          {
+            "name": "FirstName",
+            "dataType": "string",
+            "sourceColumn": "FirstName"
+          },
+          {
+            "name": "MiddleName",
+            "dataType": "string",
+            "sourceColumn": "MiddleName"
+          },
+          {
+            "name": "LastName",
+            "dataType": "string",
+            "sourceColumn": "LastName"
+          },
+          {
+            "name": "Suffix",
+            "dataType": "string",
+            "sourceColumn": "Suffix"
+          },
+          {
+            "name": "PhoneNumber",
+            "dataType": "string",
+            "sourceColumn": "PhoneNumber"
+          },
+          {
+            "name": "PhoneNumberType",
+            "dataType": "string",
+            "sourceColumn": "PhoneNumberType"
+          },
+          {
+            "name": "EmailAddress",
+            "dataType": "string",
+            "sourceColumn": "EmailAddress"
+          },
+          {
+            "name": "EmailPromotion",
+            "dataType": "int64",
+            "sourceColumn": "EmailPromotion"
+          },
+          {
+            "name": "AddressType",
+            "dataType": "string",
+            "sourceColumn": "AddressType"
+          },
+          {
+            "name": "AddressLine1",
+            "dataType": "string",
+            "sourceColumn": "AddressLine1"
+          },
+          {
+            "name": "AddressLine2",
+            "dataType": "string",
+            "sourceColumn": "AddressLine2"
+          },
+          {
+            "name": "City",
+            "dataType": "string",
+            "sourceColumn": "City"
+          },
+          {
+            "name": "StateProvinceName",
+            "dataType": "string",
+            "sourceColumn": "StateProvinceName"
+          },
+          {
+            "name": "PostalCode",
+            "dataType": "string",
+            "sourceColumn": "PostalCode"
+          },
+          {
+            "name": "CountryRegionName",
+            "dataType": "string",
+            "sourceColumn": "CountryRegionName"
+          },
+          {
+            "name": "Demographics",
+            "dataType": "string",
+            "sourceColumn": "Demographics"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Sales_vIndividualCustomer = Source{[Schema=\"Sales\",Item=\"vIndividualCustomer\"]}[Data]",
+                "in",
+                "    Sales_vIndividualCustomer"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "CustomerAgeAndOutliers",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "BusinessEntityID",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[BusinessEntityID]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "FirstName",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[FirstName]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "LastName",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[LastName]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Birth Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "sourceColumn": "[Birth Date]",
+            "formatString": "Short Date",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"DateTimeShortDatePattern\" />"
+              }
+            ]
+          },
+          {
+            "type": "calculated",
+            "name": "Age",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "YEAR(TODAY()) - YEAR('CustomerAgeAndOutliers'[Birth Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "Zscore",
+            "dataType": "int64",
+            "expression": " (CustomerAgeAndOutliers[Age] - AVERAGE(CustomerAgeAndOutliers[Age])) / STDEV.P(CustomerAgeAndOutliers[Age])"
+          },
+          {
+            "type": "calculated",
+            "name": "Outlier",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "if(CustomerAgeAndOutliers[Absolute Zscore] > 2.5, \"YES\", \"NO\")"
+          },
+          {
+            "type": "calculated",
+            "name": "Absolute Zscore",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "ABS(CustomerAgeAndOutliers[Zscore])"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": [
+                "SELECTCOLUMNS(",
+                "  'Sales vIndividualCustomer',",
+                "    \"BusinessEntityID\", ",
+                "    [BusinessEntityID], ",
+                "    \"FirstName\", ",
+                "    [FirstName], ",
+                "    \"LastName\", ",
+                "    [LastName], ",
+                "    \"Birth Date\", ",
+                "    LEFT(",
+                "        RIGHT([Demographics], LEN([Demographics]) - (SEARCH(\"<BirthDate>\", [Demographics]) + 10)), ",
+                "    SEARCH(\"</BirthDate>\", [Demographics]) - (SEARCH(\"<BirthDate>\", [Demographics]) + 12)))"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "AverageAge",
+            "expression": " AVERAGE(CustomerAgeAndOutliers[Age])",
+            "formatString": "0"
+          },
+          {
+            "name": "StdevAge",
+            "expression": " STDEV.P(CustomerAgeAndOutliers[Age])",
+            "formatString": "0"
+          }
+        ]
       }
     ],
     "relationships": [
