@@ -3,6 +3,1229 @@
   "compatibilityLevel": 1500,
   "model": {
     "culture": "en-US",
+    "discourageImplicitMeasures": true,
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "SQL/DAVIDDEMETRADZE;AdventureWorks2019",
+        "connectionDetails": {
+          "protocol": "tds",
+          "address": {
+            "server": "DAVIDDEMETRADZE",
+            "database": "AdventureWorks2019"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "credential": {
+          "AuthenticationKind": "UsernamePassword",
+          "kind": "SQL",
+          "path": "daviddemetradze;AdventureWorks2019",
+          "Username": "AdventureWorks",
+          "EncryptConnection": false
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "Purchasing PurchaseOrderHeader",
+        "columns": [
+          {
+            "name": "PurchaseOrderID",
+            "dataType": "int64",
+            "sourceColumn": "PurchaseOrderID"
+          },
+          {
+            "name": "RevisionNumber",
+            "dataType": "int64",
+            "sourceColumn": "RevisionNumber"
+          },
+          {
+            "name": "Status",
+            "dataType": "int64",
+            "sourceColumn": "Status"
+          },
+          {
+            "name": "EmployeeID",
+            "dataType": "int64",
+            "sourceColumn": "EmployeeID"
+          },
+          {
+            "name": "VendorID",
+            "dataType": "int64",
+            "sourceColumn": "VendorID"
+          },
+          {
+            "name": "ShipMethodID",
+            "dataType": "int64",
+            "sourceColumn": "ShipMethodID"
+          },
+          {
+            "name": "OrderDate",
+            "dataType": "dateTime",
+            "sourceColumn": "OrderDate"
+          },
+          {
+            "name": "ShipDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ShipDate"
+          },
+          {
+            "name": "SubTotal",
+            "dataType": "decimal",
+            "sourceColumn": "SubTotal"
+          },
+          {
+            "name": "TaxAmt",
+            "dataType": "decimal",
+            "sourceColumn": "TaxAmt"
+          },
+          {
+            "name": "Freight",
+            "dataType": "decimal",
+            "sourceColumn": "Freight"
+          },
+          {
+            "name": "TotalDue",
+            "dataType": "decimal",
+            "sourceColumn": "TotalDue"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Purchasing_PurchaseOrderHeader = Source{[Schema=\"Purchasing\",Item=\"PurchaseOrderHeader\"]}[Data]",
+                "in",
+                "    Purchasing_PurchaseOrderHeader"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "TotalDueSum",
+            "expression": " SUM('Purchasing PurchaseOrderHeader'[TotalDue])",
+            "formatString": "#,0"
+          }
+        ]
+      },
+      {
+        "name": "Purchasing PurchaseOrderDetail",
+        "columns": [
+          {
+            "name": "PurchaseOrderID",
+            "dataType": "int64",
+            "sourceColumn": "PurchaseOrderID"
+          },
+          {
+            "name": "PurchaseOrderDetailID",
+            "dataType": "int64",
+            "sourceColumn": "PurchaseOrderDetailID"
+          },
+          {
+            "name": "DueDate",
+            "dataType": "dateTime",
+            "sourceColumn": "DueDate"
+          },
+          {
+            "name": "OrderQty",
+            "dataType": "int64",
+            "sourceColumn": "OrderQty"
+          },
+          {
+            "name": "ProductID",
+            "dataType": "int64",
+            "sourceColumn": "ProductID"
+          },
+          {
+            "name": "UnitPrice",
+            "dataType": "decimal",
+            "sourceColumn": "UnitPrice"
+          },
+          {
+            "name": "LineTotal",
+            "dataType": "decimal",
+            "sourceColumn": "LineTotal"
+          },
+          {
+            "name": "ReceivedQty",
+            "dataType": "double",
+            "sourceColumn": "ReceivedQty"
+          },
+          {
+            "name": "RejectedQty",
+            "dataType": "double",
+            "sourceColumn": "RejectedQty"
+          },
+          {
+            "name": "StockedQty",
+            "dataType": "double",
+            "sourceColumn": "StockedQty"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Purchasing_PurchaseOrderDetail = Source{[Schema=\"Purchasing\",Item=\"PurchaseOrderDetail\"]}[Data]",
+                "in",
+                "    Purchasing_PurchaseOrderDetail"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "PurchaseOrderIDWithTheMostItems",
+            "expression": [
+              "",
+              "MAXX(",
+              "    TOPN(",
+              "        1,",
+              "        SUMMARIZE(",
+              "            'Purchasing PurchaseOrderDetail',",
+              "            'Purchasing PurchaseOrderDetail'[PurchaseOrderID], ",
+              "            \"TotalQuantityPerOrder\", ",
+              "             SUM('Purchasing PurchaseOrderDetail'[OrderQty])",
+              "        ),",
+              "        [TotalQuantityPerOrder], ",
+              "        DESC),",
+              "    'Purchasing PurchaseOrderDetail'[PurchaseOrderID]",
+              ") ",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "name": "HumanResources EmployeePayHistory",
+        "columns": [
+          {
+            "name": "BusinessEntityID",
+            "dataType": "int64",
+            "sourceColumn": "BusinessEntityID"
+          },
+          {
+            "name": "RateChangeDate",
+            "dataType": "dateTime",
+            "sourceColumn": "RateChangeDate"
+          },
+          {
+            "name": "Rate",
+            "dataType": "decimal",
+            "sourceColumn": "Rate"
+          },
+          {
+            "name": "PayFrequency",
+            "dataType": "int64",
+            "sourceColumn": "PayFrequency"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    HumanResources_EmployeePayHistory = Source{[Schema=\"HumanResources\",Item=\"EmployeePayHistory\"]}[Data]",
+                "in",
+                "    HumanResources_EmployeePayHistory"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sales Customer",
+        "columns": [
+          {
+            "name": "CustomerID",
+            "dataType": "int64",
+            "sourceColumn": "CustomerID"
+          },
+          {
+            "name": "PersonID",
+            "dataType": "int64",
+            "sourceColumn": "PersonID"
+          },
+          {
+            "name": "StoreID",
+            "dataType": "int64",
+            "sourceColumn": "StoreID"
+          },
+          {
+            "name": "TerritoryID",
+            "dataType": "int64",
+            "sourceColumn": "TerritoryID"
+          },
+          {
+            "name": "AccountNumber",
+            "dataType": "string",
+            "sourceColumn": "AccountNumber"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Sales_Customer = Source{[Schema=\"Sales\",Item=\"Customer\"]}[Data]",
+                "in",
+                "    Sales_Customer"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "HumanResources Employee",
+        "columns": [
+          {
+            "name": "BusinessEntityID",
+            "dataType": "int64",
+            "sourceColumn": "BusinessEntityID"
+          },
+          {
+            "name": "NationalIDNumber",
+            "dataType": "string",
+            "sourceColumn": "NationalIDNumber"
+          },
+          {
+            "name": "LoginID",
+            "dataType": "string",
+            "sourceColumn": "LoginID"
+          },
+          {
+            "name": "OrganizationNode",
+            "dataType": "string",
+            "sourceColumn": "OrganizationNode"
+          },
+          {
+            "name": "OrganizationLevel",
+            "dataType": "int64",
+            "sourceColumn": "OrganizationLevel"
+          },
+          {
+            "name": "JobTitle",
+            "dataType": "string",
+            "sourceColumn": "JobTitle"
+          },
+          {
+            "name": "BirthDate",
+            "dataType": "dateTime",
+            "sourceColumn": "BirthDate"
+          },
+          {
+            "name": "MaritalStatus",
+            "dataType": "string",
+            "sourceColumn": "MaritalStatus"
+          },
+          {
+            "name": "Gender",
+            "dataType": "string",
+            "sourceColumn": "Gender"
+          },
+          {
+            "name": "HireDate",
+            "dataType": "dateTime",
+            "sourceColumn": "HireDate"
+          },
+          {
+            "name": "SalariedFlag",
+            "dataType": "boolean",
+            "sourceColumn": "SalariedFlag"
+          },
+          {
+            "name": "VacationHours",
+            "dataType": "int64",
+            "sourceColumn": "VacationHours"
+          },
+          {
+            "name": "SickLeaveHours",
+            "dataType": "int64",
+            "sourceColumn": "SickLeaveHours"
+          },
+          {
+            "name": "CurrentFlag",
+            "dataType": "boolean",
+            "sourceColumn": "CurrentFlag"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    HumanResources_Employee = Source{[Schema=\"HumanResources\",Item=\"Employee\"]}[Data]",
+                "in",
+                "    HumanResources_Employee"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Purchasing ShipMethod",
+        "columns": [
+          {
+            "name": "ShipMethodID",
+            "dataType": "int64",
+            "sourceColumn": "ShipMethodID"
+          },
+          {
+            "name": "Name",
+            "dataType": "string",
+            "sourceColumn": "Name"
+          },
+          {
+            "name": "ShipBase",
+            "dataType": "decimal",
+            "sourceColumn": "ShipBase"
+          },
+          {
+            "name": "ShipRate",
+            "dataType": "decimal",
+            "sourceColumn": "ShipRate"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Purchasing_ShipMethod = Source{[Schema=\"Purchasing\",Item=\"ShipMethod\"]}[Data]",
+                "in",
+                "    Purchasing_ShipMethod"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Purchasing Vendor",
+        "columns": [
+          {
+            "name": "BusinessEntityID",
+            "dataType": "int64",
+            "sourceColumn": "BusinessEntityID"
+          },
+          {
+            "name": "AccountNumber",
+            "dataType": "string",
+            "sourceColumn": "AccountNumber"
+          },
+          {
+            "name": "Name",
+            "dataType": "string",
+            "sourceColumn": "Name"
+          },
+          {
+            "name": "CreditRating",
+            "dataType": "int64",
+            "sourceColumn": "CreditRating"
+          },
+          {
+            "name": "PreferredVendorStatus",
+            "dataType": "boolean",
+            "sourceColumn": "PreferredVendorStatus"
+          },
+          {
+            "name": "ActiveFlag",
+            "dataType": "boolean",
+            "sourceColumn": "ActiveFlag"
+          },
+          {
+            "name": "PurchasingWebServiceURL",
+            "dataType": "string",
+            "sourceColumn": "PurchasingWebServiceURL"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Purchasing_Vendor = Source{[Schema=\"Purchasing\",Item=\"Vendor\"]}[Data]",
+                "in",
+                "    Purchasing_Vendor"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Person Person",
+        "columns": [
+          {
+            "name": "BusinessEntityID",
+            "dataType": "int64",
+            "sourceColumn": "BusinessEntityID"
+          },
+          {
+            "name": "PersonType",
+            "dataType": "string",
+            "sourceColumn": "PersonType"
+          },
+          {
+            "name": "NameStyle",
+            "dataType": "boolean",
+            "sourceColumn": "NameStyle"
+          },
+          {
+            "name": "Title",
+            "dataType": "string",
+            "sourceColumn": "Title"
+          },
+          {
+            "name": "FirstName",
+            "dataType": "string",
+            "sourceColumn": "FirstName"
+          },
+          {
+            "name": "MiddleName",
+            "dataType": "string",
+            "sourceColumn": "MiddleName"
+          },
+          {
+            "name": "LastName",
+            "dataType": "string",
+            "sourceColumn": "LastName"
+          },
+          {
+            "name": "Suffix",
+            "dataType": "string",
+            "sourceColumn": "Suffix"
+          },
+          {
+            "name": "EmailPromotion",
+            "dataType": "int64",
+            "sourceColumn": "EmailPromotion"
+          },
+          {
+            "name": "AdditionalContactInfo",
+            "dataType": "string",
+            "sourceColumn": "AdditionalContactInfo"
+          },
+          {
+            "name": "Demographics",
+            "dataType": "string",
+            "sourceColumn": "Demographics"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Person_Person = Source{[Schema=\"Person\",Item=\"Person\"]}[Data]",
+                "in",
+                "    Person_Person"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sales SalesOrderHeader",
+        "columns": [
+          {
+            "name": "SalesOrderID",
+            "dataType": "int64",
+            "sourceColumn": "SalesOrderID"
+          },
+          {
+            "name": "RevisionNumber",
+            "dataType": "int64",
+            "sourceColumn": "RevisionNumber"
+          },
+          {
+            "name": "OrderDate",
+            "dataType": "dateTime",
+            "sourceColumn": "OrderDate"
+          },
+          {
+            "name": "DueDate",
+            "dataType": "dateTime",
+            "sourceColumn": "DueDate"
+          },
+          {
+            "name": "ShipDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ShipDate"
+          },
+          {
+            "name": "Status",
+            "dataType": "int64",
+            "sourceColumn": "Status"
+          },
+          {
+            "name": "OnlineOrderFlag",
+            "dataType": "boolean",
+            "sourceColumn": "OnlineOrderFlag"
+          },
+          {
+            "name": "SalesOrderNumber",
+            "dataType": "string",
+            "sourceColumn": "SalesOrderNumber"
+          },
+          {
+            "name": "PurchaseOrderNumber",
+            "dataType": "string",
+            "sourceColumn": "PurchaseOrderNumber"
+          },
+          {
+            "name": "AccountNumber",
+            "dataType": "string",
+            "sourceColumn": "AccountNumber"
+          },
+          {
+            "name": "CustomerID",
+            "dataType": "int64",
+            "sourceColumn": "CustomerID"
+          },
+          {
+            "name": "SalesPersonID",
+            "dataType": "int64",
+            "sourceColumn": "SalesPersonID"
+          },
+          {
+            "name": "TerritoryID",
+            "dataType": "int64",
+            "sourceColumn": "TerritoryID"
+          },
+          {
+            "name": "BillToAddressID",
+            "dataType": "int64",
+            "sourceColumn": "BillToAddressID"
+          },
+          {
+            "name": "ShipToAddressID",
+            "dataType": "int64",
+            "sourceColumn": "ShipToAddressID"
+          },
+          {
+            "name": "ShipMethodID",
+            "dataType": "int64",
+            "sourceColumn": "ShipMethodID"
+          },
+          {
+            "name": "CreditCardID",
+            "dataType": "int64",
+            "sourceColumn": "CreditCardID"
+          },
+          {
+            "name": "CreditCardApprovalCode",
+            "dataType": "string",
+            "sourceColumn": "CreditCardApprovalCode"
+          },
+          {
+            "name": "CurrencyRateID",
+            "dataType": "int64",
+            "sourceColumn": "CurrencyRateID"
+          },
+          {
+            "name": "SubTotal",
+            "dataType": "decimal",
+            "sourceColumn": "SubTotal"
+          },
+          {
+            "name": "TaxAmt",
+            "dataType": "decimal",
+            "sourceColumn": "TaxAmt"
+          },
+          {
+            "name": "Freight",
+            "dataType": "decimal",
+            "sourceColumn": "Freight"
+          },
+          {
+            "name": "TotalDue",
+            "dataType": "decimal",
+            "sourceColumn": "TotalDue"
+          },
+          {
+            "name": "Comment",
+            "dataType": "string",
+            "sourceColumn": "Comment"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Sales_SalesOrderHeader = Source{[Schema=\"Sales\",Item=\"SalesOrderHeader\"]}[Data]",
+                "in",
+                "    Sales_SalesOrderHeader"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sales SalesTerritory",
+        "columns": [
+          {
+            "name": "TerritoryID",
+            "dataType": "int64",
+            "sourceColumn": "TerritoryID"
+          },
+          {
+            "name": "Name",
+            "dataType": "string",
+            "sourceColumn": "Name"
+          },
+          {
+            "name": "CountryRegionCode",
+            "dataType": "string",
+            "sourceColumn": "CountryRegionCode"
+          },
+          {
+            "name": "Group",
+            "dataType": "string",
+            "sourceColumn": "Group"
+          },
+          {
+            "name": "SalesYTD",
+            "dataType": "decimal",
+            "sourceColumn": "SalesYTD"
+          },
+          {
+            "name": "SalesLastYear",
+            "dataType": "decimal",
+            "sourceColumn": "SalesLastYear"
+          },
+          {
+            "name": "CostYTD",
+            "dataType": "decimal",
+            "sourceColumn": "CostYTD"
+          },
+          {
+            "name": "CostLastYear",
+            "dataType": "decimal",
+            "sourceColumn": "CostLastYear"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Sales_SalesTerritory = Source{[Schema=\"Sales\",Item=\"SalesTerritory\"]}[Data]",
+                "in",
+                "    Sales_SalesTerritory"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sales Store",
+        "columns": [
+          {
+            "name": "BusinessEntityID",
+            "dataType": "int64",
+            "sourceColumn": "BusinessEntityID"
+          },
+          {
+            "name": "Name",
+            "dataType": "string",
+            "sourceColumn": "Name"
+          },
+          {
+            "name": "SalesPersonID",
+            "dataType": "int64",
+            "sourceColumn": "SalesPersonID"
+          },
+          {
+            "name": "Demographics",
+            "dataType": "string",
+            "sourceColumn": "Demographics"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Sales_Store = Source{[Schema=\"Sales\",Item=\"Store\"]}[Data]",
+                "in",
+                "    Sales_Store"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Production Product",
+        "columns": [
+          {
+            "name": "ProductID",
+            "dataType": "int64",
+            "sourceColumn": "ProductID"
+          },
+          {
+            "name": "Name",
+            "dataType": "string",
+            "sourceColumn": "Name"
+          },
+          {
+            "name": "ProductNumber",
+            "dataType": "string",
+            "sourceColumn": "ProductNumber"
+          },
+          {
+            "name": "MakeFlag",
+            "dataType": "boolean",
+            "sourceColumn": "MakeFlag"
+          },
+          {
+            "name": "FinishedGoodsFlag",
+            "dataType": "boolean",
+            "sourceColumn": "FinishedGoodsFlag"
+          },
+          {
+            "name": "Color",
+            "dataType": "string",
+            "sourceColumn": "Color"
+          },
+          {
+            "name": "SafetyStockLevel",
+            "dataType": "int64",
+            "sourceColumn": "SafetyStockLevel"
+          },
+          {
+            "name": "ReorderPoint",
+            "dataType": "int64",
+            "sourceColumn": "ReorderPoint"
+          },
+          {
+            "name": "StandardCost",
+            "dataType": "decimal",
+            "sourceColumn": "StandardCost"
+          },
+          {
+            "name": "ListPrice",
+            "dataType": "decimal",
+            "sourceColumn": "ListPrice"
+          },
+          {
+            "name": "Size",
+            "dataType": "string",
+            "sourceColumn": "Size"
+          },
+          {
+            "name": "SizeUnitMeasureCode",
+            "dataType": "string",
+            "sourceColumn": "SizeUnitMeasureCode"
+          },
+          {
+            "name": "WeightUnitMeasureCode",
+            "dataType": "string",
+            "sourceColumn": "WeightUnitMeasureCode"
+          },
+          {
+            "name": "Weight",
+            "dataType": "double",
+            "sourceColumn": "Weight"
+          },
+          {
+            "name": "DaysToManufacture",
+            "dataType": "int64",
+            "sourceColumn": "DaysToManufacture"
+          },
+          {
+            "name": "ProductLine",
+            "dataType": "string",
+            "sourceColumn": "ProductLine"
+          },
+          {
+            "name": "Class",
+            "dataType": "string",
+            "sourceColumn": "Class"
+          },
+          {
+            "name": "Style",
+            "dataType": "string",
+            "sourceColumn": "Style"
+          },
+          {
+            "name": "ProductSubcategoryID",
+            "dataType": "int64",
+            "sourceColumn": "ProductSubcategoryID"
+          },
+          {
+            "name": "ProductModelID",
+            "dataType": "int64",
+            "sourceColumn": "ProductModelID"
+          },
+          {
+            "name": "SellStartDate",
+            "dataType": "dateTime",
+            "sourceColumn": "SellStartDate"
+          },
+          {
+            "name": "SellEndDate",
+            "dataType": "dateTime",
+            "sourceColumn": "SellEndDate"
+          },
+          {
+            "name": "DiscontinuedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "DiscontinuedDate"
+          },
+          {
+            "name": "rowguid",
+            "dataType": "string",
+            "sourceColumn": "rowguid"
+          },
+          {
+            "name": "ModifiedDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ModifiedDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/DAVIDDEMETRADZE;AdventureWorks2019\",",
+                "    Production_Product = Source{[Schema=\"Production\",Item=\"Product\"]}[Data]",
+                "in",
+                "    Production_Product"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LatestRatePerEmployee",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "BusinessEntityID",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[BusinessEntityID]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Rate",
+            "dataType": "decimal",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Rate]",
+            "formatString": "\\$#,0.00;(\\$#,0.00);\\$#,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"1033\" DisplayName=\"$ English (United States)\" Symbol=\"$\" PositivePattern=\"0\" NegativePattern=\"0\" /></Format>"
+              }
+            ]
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "FirstName",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[FirstName]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "LastName",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[LastName]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "LastRateChange",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[LastRateChange]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": [
+                "SELECTCOLUMNS(",
+                "    NATURALINNERJOIN(",
+                "        SELECTCOLUMNS(",
+                "            'Person Person',",
+                "            \"BusinessEntityID\", 'Person Person'[BusinessEntityID]&\"\",",
+                "            \"FirstName\", 'Person Person'[FirstName],",
+                "            \"LastName\", 'Person Person'[LastName]",
+                "        ),",
+                "        NATURALINNERJOIN(",
+                "            SELECTCOLUMNS(",
+                "                'HumanResources EmployeePayHistory', ",
+                "                \"BusinessEntityID\", 'HumanResources EmployeePayHistory'[BusinessEntityID]&\"\", ",
+                "                \"Rate\", 'HumanResources EmployeePayHistory'[Rate], ",
+                "                \"LatestRateChange\", 'HumanResources EmployeePayHistory'[RateChangeDate]&\"\"),",
+                "            SELECTCOLUMNS(",
+                "                SUMMARIZE(",
+                "                    'HumanResources EmployeePayHistory', ",
+                "                    'HumanResources Employee'[BusinessEntityID],",
+                "                    \"LatestRateChange\", MAX('HumanResources EmployeePayHistory'[RateChangeDate])), ",
+                "                \"BusinessEntityID\", [BusinessEntityID]&\"\", ",
+                "                \"LatestRateChange\", [LatestRateChange]&\"\")",
+                "        )",
+                "    ),",
+                "    \"BusinessEntityID\", [BusinessEntityID],",
+                "    \"FirstName\", [FirstName],",
+                "    \"LastName\", [LastName],",
+                "    \"Rate\", [Rate],",
+                "    \"LastRateChange\", [LatestRateChange]",
+                ")"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "15129a6a-4f54-4b5d-a14d-91b3cd72dbdd",
+        "fromTable": "Purchasing PurchaseOrderHeader",
+        "fromColumn": "ShipMethodID",
+        "toTable": "Purchasing ShipMethod",
+        "toColumn": "ShipMethodID"
+      },
+      {
+        "name": "1ecd6eca-0067-4a3e-a8cc-b8981e43e11c",
+        "fromCardinality": "one",
+        "fromTable": "Person Person",
+        "fromColumn": "BusinessEntityID",
+        "toTable": "HumanResources Employee",
+        "toColumn": "BusinessEntityID",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "5b518850-43c0-4363-a042-ebb8e35a2536",
+        "fromTable": "Sales SalesOrderHeader",
+        "fromColumn": "ShipMethodID",
+        "toTable": "Purchasing ShipMethod",
+        "toColumn": "ShipMethodID"
+      },
+      {
+        "name": "5535ff42-d2ec-4e5b-9454-7737a86b5b21",
+        "fromTable": "Sales SalesOrderHeader",
+        "fromColumn": "TerritoryID",
+        "toTable": "Sales SalesTerritory",
+        "toColumn": "TerritoryID",
+        "isActive": false
+      },
+      {
+        "name": "c2f4f6c6-f045-40ac-8919-59f671a28774",
+        "fromTable": "Purchasing PurchaseOrderHeader",
+        "fromColumn": "EmployeeID",
+        "toTable": "HumanResources Employee",
+        "toColumn": "BusinessEntityID"
+      },
+      {
+        "name": "927eb318-469d-414f-bc5e-a75004d6919b",
+        "fromTable": "Purchasing PurchaseOrderDetail",
+        "fromColumn": "PurchaseOrderID",
+        "toTable": "Purchasing PurchaseOrderHeader",
+        "toColumn": "PurchaseOrderID"
+      },
+      {
+        "name": "06bf3523-0869-4142-b87c-34daa387c54f",
+        "fromTable": "Purchasing PurchaseOrderHeader",
+        "fromColumn": "VendorID",
+        "toTable": "Purchasing Vendor",
+        "toColumn": "BusinessEntityID"
+      },
+      {
+        "name": "eefde95f-a19e-4082-b8c6-6dabb60ec8ca",
+        "fromTable": "Purchasing PurchaseOrderDetail",
+        "fromColumn": "ProductID",
+        "toTable": "Production Product",
+        "toColumn": "ProductID"
+      },
+      {
+        "name": "fa592413-8067-4626-8542-0969d3eb7127",
+        "fromTable": "HumanResources EmployeePayHistory",
+        "fromColumn": "BusinessEntityID",
+        "toTable": "HumanResources Employee",
+        "toColumn": "BusinessEntityID"
+      },
+      {
+        "name": "eccfa70f-688d-4015-8171-0fba9501ddc8",
+        "fromTable": "Sales Customer",
+        "fromColumn": "PersonID",
+        "toTable": "Person Person",
+        "toColumn": "BusinessEntityID"
+      },
+      {
+        "name": "84afb591-bf48-4856-aba5-eb8c6b787db7",
+        "fromTable": "Sales SalesOrderHeader",
+        "fromColumn": "CustomerID",
+        "toTable": "Sales Customer",
+        "toColumn": "CustomerID"
+      },
+      {
+        "name": "c655edfd-1388-4990-a503-e7be10a65c28",
+        "fromTable": "Sales Customer",
+        "fromColumn": "TerritoryID",
+        "toTable": "Sales SalesTerritory",
+        "toColumn": "TerritoryID"
+      },
+      {
+        "name": "0689e695-aba4-40c8-a656-2ef13801fbe3",
+        "fromTable": "Sales Customer",
+        "fromColumn": "StoreID",
+        "toTable": "Sales Store",
+        "toColumn": "BusinessEntityID"
+      }
+    ],
     "annotations": [
       {
         "name": "ClientCompatibilityLevel",
